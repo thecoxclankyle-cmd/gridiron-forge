@@ -3,22 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title>Gridiron Forge</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: white;
       text-align: center;
+      margin: 0;
+      padding: 20px;
     }
 
     h1 {
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     .creator {
       display: flex;
       justify-content: center;
-      gap: 60px;
-      margin-top: 30px;
+      gap: 80px;
+      margin-top: 40px;
     }
 
     .uniform {
@@ -27,71 +30,109 @@
       align-items: center;
     }
 
+    /* HELMET */
     .helmet {
-      width: 80px;
-      height: 50px;
-      border-radius: 40px 40px 20px 20px;
+      width: 90px;
+      height: 55px;
       background: gray;
-      margin-bottom: 5px;
+      border-radius: 50px 50px 30px 30px;
+      margin-bottom: 6px;
     }
 
+    /* JERSEY */
     .jersey {
-      width: 120px;
-      height: 120px;
+      position: relative;
+      width: 140px;
+      height: 125px;
       background: blue;
+      border-radius: 22px 22px 18px 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
       font-size: 36px;
       font-weight: bold;
+      color: white;
     }
 
+    /* SLEEVES */
+    .sleeve {
+      position: absolute;
+      top: 18px;
+      width: 38px;
+      height: 55px;
+      background: inherit;
+      border-radius: 18px;
+    }
+
+    .sleeve.left {
+      left: -32px;
+    }
+
+    .sleeve.right {
+      right: -32px;
+    }
+
+    /* PANTS */
     .pants {
-      width: 120px;
-      height: 70px;
+      width: 140px;
+      height: 85px;
       background: silver;
+      border-radius: 14px 14px 26px 26px;
+      margin-top: 4px;
     }
 
+    /* CONTROLS */
     .controls {
-      margin-top: 40px;
+      margin-top: 45px;
     }
 
     .control {
-      margin: 10px 0;
+      margin: 12px 0;
     }
   </style>
 </head>
+
 <body>
 
 <h1>Gridiron Forge</h1>
-<p>Create your own football uniform</p>
+<p>Create your own American football uniform</p>
 
 <div class="creator">
 
-  <!-- Front View -->
+  <!-- FRONT VIEW -->
   <div class="uniform">
     <h3>Front</h3>
+
     <div class="helmet" id="helmetFront"></div>
+
     <div class="jersey" id="jerseyFront">
+      <div class="sleeve left"></div>
+      <div class="sleeve right"></div>
       <span id="numberFront">12</span>
     </div>
+
     <div class="pants" id="pantsFront"></div>
   </div>
 
-  <!-- Back View -->
+  <!-- BACK VIEW -->
   <div class="uniform">
     <h3>Back</h3>
+
     <div class="helmet" id="helmetBack"></div>
+
     <div class="jersey" id="jerseyBack">
+      <div class="sleeve left"></div>
+      <div class="sleeve right"></div>
       <span id="numberBack">12</span>
     </div>
+
     <div class="pants" id="pantsBack"></div>
   </div>
 
 </div>
 
 <div class="controls">
+
   <div class="control">
     Jersey Color:
     <input type="color" onchange="setJerseyColor(this.value)">
@@ -112,6 +153,7 @@
     <input type="range" min="0" max="99" value="12" oninput="setNumber(this.value)">
     <span id="numberValue">12</span>
   </div>
+
 </div>
 
 <script>
