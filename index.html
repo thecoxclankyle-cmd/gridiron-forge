@@ -2,182 +2,162 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Gridiron Forge</title>
-
+  <title>3D Gridiron Forge</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: white;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      margin-top: 10px;
-    }
-
-    .creator {
-      display: flex;
-      justify-content: center;
-      gap: 80px;
-      margin-top: 40px;
-    }
-
-    .uniform {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* HELMET */
-    .helmet {
-      width: 90px;
-      height: 55px;
-      background: gray;
-      border-radius: 50px 50px 30px 30px;
-      margin-bottom: 6px;
-    }
-
-    /* JERSEY */
-    .jersey {
-      position: relative;
-      width: 140px;
-      height: 125px;
-      background: blue;
-      border-radius: 22px 22px 18px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      font-weight: bold;
-      color: white;
-    }
-
-    /* SLEEVES */
-    .sleeve {
-      position: absolute;
-      top: 18px;
-      width: 38px;
-      height: 55px;
-      background: inherit;
-      border-radius: 18px;
-    }
-
-    .sleeve.left {
-      left: -32px;
-    }
-
-    .sleeve.right {
-      right: -32px;
-    }
-
-    /* PANTS */
-    .pants {
-      width: 140px;
-      height: 85px;
-      background: silver;
-      border-radius: 14px 14px 26px 26px;
-      margin-top: 4px;
-    }
-
-    /* CONTROLS */
-    .controls {
-      margin-top: 45px;
-    }
-
-    .control {
-      margin: 12px 0;
-    }
+    body { margin: 0; font-family: Arial; text-align:center; background: white; }
+    #container { width: 100%; height: 500px; }
+    .controls { margin-top: 20px; }
+    .control { margin: 10px; }
   </style>
 </head>
-
 <body>
+  <h1>3D Gridiron Forge</h1>
+  <div id="container"></div>
 
-<h1>Gridiron Forge</h1>
-<p>Create your own American football uniform</p>
-
-<div class="creator">
-
-  <!-- FRONT VIEW -->
-  <div class="uniform">
-    <h3>Front</h3>
-
-    <div class="helmet" id="helmetFront"></div>
-
-    <div class="jersey" id="jerseyFront">
-      <div class="sleeve left"></div>
-      <div class="sleeve right"></div>
-      <span id="numberFront">12</span>
+  <div class="controls">
+    <div class="control">
+      Jersey Color: <input type="color" id="jerseyColor" value="#0000ff">
     </div>
-
-    <div class="pants" id="pantsFront"></div>
-  </div>
-
-  <!-- BACK VIEW -->
-  <div class="uniform">
-    <h3>Back</h3>
-
-    <div class="helmet" id="helmetBack"></div>
-
-    <div class="jersey" id="jerseyBack">
-      <div class="sleeve left"></div>
-      <div class="sleeve right"></div>
-      <span id="numberBack">12</span>
+    <div class="control">
+      Pants Color: <input type="color" id="pantsColor" value="#c0c0c0">
     </div>
-
-    <div class="pants" id="pantsBack"></div>
+    <div class="control">
+      Helmet Color: <input type="color" id="helmetColor" value="#808080">
+    </div>
+    <div class="control">
+      Player Number: 
+      <input type="range" id="playerNumber" min="0" max="99" value="12">
+      <span id="numberDisplay">12</span>
+    </div>
   </div>
 
-</div>
+  <!-- Three.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/examples/js/controls/OrbitControls.js"></script>
 
-<div class="controls">
+  <script>
+    // Scene, camera, renderer
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
 
-  <div class="control">
-    Jersey Color:
-    <input type="color" onchange="setJerseyColor(this.value)">
-  </div>
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth/500, 0.1, 1000);
+    camera.position.set(0, 5, 10);
 
-  <div class="control">
-    Pants Color:
-    <input type="color" onchange="setPantsColor(this.value)">
-  </div>
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, 500);
+    document.getElementById('container').appendChild(renderer.domElement);
 
-  <div class="control">
-    Helmet Color:
-    <input type="color" onchange="setHelmetColor(this.value)">
-  </div>
+    // Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enablePan = false;
+    controls.minDistance = 5;
+    controls.maxDistance = 20;
 
-  <div class="control">
-    Player Number:
-    <input type="range" min="0" max="99" value="12" oninput="setNumber(this.value)">
-    <span id="numberValue">12</span>
-  </div>
+    // Lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5,10,5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
 
-</div>
+    // Materials
+    const jerseyMaterial = new THREE.MeshStandardMaterial({color: 0x0000ff});
+    const pantsMaterial = new THREE.MeshStandardMaterial({color: 0xc0c0c0});
+    const helmetMaterial = new THREE.MeshStandardMaterial({color: 0x808080});
 
-<script>
-  function setJerseyColor(color) {
-    jerseyFront.style.background = color;
-    jerseyBack.style.background = color;
-  }
+    // Player body (simple boxes)
+    const bodyGroup = new THREE.Group();
 
-  function setPantsColor(color) {
-    pantsFront.style.background = color;
-    pantsBack.style.background = color;
-  }
+    // Torso (jersey)
+    const torsoGeometry = new THREE.BoxGeometry(1.5,2.5,0.8);
+    const torso = new THREE.Mesh(torsoGeometry, jerseyMaterial);
+    torso.position.y = 2.5;
+    bodyGroup.add(torso);
 
-  function setHelmetColor(color) {
-    helmetFront.style.background = color;
-    helmetBack.style.background = color;
-  }
+    // Head (helmet)
+    const headGeometry = new THREE.SphereGeometry(0.6,32,32);
+    const head = new THREE.Mesh(headGeometry, helmetMaterial);
+    head.position.y = 4.3;
+    bodyGroup.add(head);
 
-  function setNumber(num) {
-    numberFront.textContent = num;
-    numberBack.textContent = num;
-    numberValue.textContent = num;
-  }
-</script>
+    // Pants
+    const pantsGeometry = new THREE.BoxGeometry(1.5,1.5,0.8);
+    const pants = new THREE.Mesh(pantsGeometry, pantsMaterial);
+    pants.position.y = 0.75;
+    bodyGroup.add(pants);
 
+    // Arms (simple cylinders)
+    const armGeom = new THREE.CylinderGeometry(0.25,0.25,2,12);
+    const leftArm = new THREE.Mesh(armGeom, jerseyMaterial);
+    leftArm.rotation.z = Math.PI/2;
+    leftArm.position.set(-1.1,2.5,0);
+    bodyGroup.add(leftArm);
+
+    const rightArm = new THREE.Mesh(armGeom, jerseyMaterial);
+    rightArm.rotation.z = Math.PI/2;
+    rightArm.position.set(1.1,2.5,0);
+    bodyGroup.add(rightArm);
+
+    scene.add(bodyGroup);
+
+    // Number as 3D text
+    const loader = new THREE.FontLoader();
+    let numberMesh;
+    loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font){
+      const textGeometry = new THREE.TextGeometry('12', {
+        font: font,
+        size: 0.6,
+        height: 0.1
+      });
+      numberMesh = new THREE.Mesh(textGeometry, new THREE.MeshStandardMaterial({color:0xffffff}));
+      numberMesh.position.set(-0.45,2.4,0.41);
+      bodyGroup.add(numberMesh);
+    });
+
+    // Handle input changes
+    document.getElementById('jerseyColor').addEventListener('input', (e)=>{
+      jerseyMaterial.color.set(e.target.value);
+      leftArm.material.color.set(e.target.value);
+      rightArm.material.color.set(e.target.value);
+    });
+
+    document.getElementById('pantsColor').addEventListener('input', (e)=>{
+      pantsMaterial.color.set(e.target.value);
+    });
+
+    document.getElementById('helmetColor').addEventListener('input', (e)=>{
+      helmetMaterial.color.set(e.target.value);
+    });
+
+    document.getElementById('playerNumber').addEventListener('input', (e)=>{
+      const val = e.target.value;
+      document.getElementById('numberDisplay').textContent = val;
+      if(numberMesh){
+        bodyGroup.remove(numberMesh);
+        loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font){
+          const textGeometry = new THREE.TextGeometry(val, {
+            font: font,
+            size: 0.6,
+            height: 0.1
+          });
+          numberMesh = new THREE.Mesh(textGeometry, new THREE.MeshStandardMaterial({color:0xffffff}));
+          numberMesh.position.set(-0.45,2.4,0.41);
+          bodyGroup.add(numberMesh);
+        });
+      }
+    });
+
+    // Animation loop
+    function animate(){
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', ()=>{
+      camera.aspect = window.innerWidth/500;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth,500);
+    });
+  </script>
 </body>
 </html>
